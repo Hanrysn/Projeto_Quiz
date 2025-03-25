@@ -80,4 +80,34 @@ routes.post('/Admin', async (req, res)=>{
 
 
 
+
+//cadastro perguntas
+routes.post('/Cperguntas', async (req, res)=>{
+    try{
+        const {pergunta, a, b, c, d, resposta, dificuldade, correct_answer } = req.body;
+    await sql`insert into perguntas (pergunta, a, b, c, d, resposta, dificuldade, correct_answer) values (${pergunta}, ${a}, ${b}, ${c}, ${d}, ${resposta}, ${dificuldade}, ${correct_answer});`
+    return res.status(200).json('ok')
+    }
+    catch(error){
+        console.log(error)
+        return res.status(500).json('erro ao cadastrar pergunta')
+    }
+})
+
+
+//Busca perguntas
+routes.post('/Bperguntas',async (req, res)=>{
+
+    try{
+            const consulta = await sql`SELECT * FROM perguntas ORDER BY RANDOM() LIMIT 1`
+            return res.status(200).json(consulta)
+    }
+    catch(error){
+        console.log(error)
+        return res.status(500).json('Ocorreu um erro inesperado')
+    }
+    
+});
+
+
 export default routes
