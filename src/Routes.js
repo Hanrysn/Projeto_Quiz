@@ -35,25 +35,29 @@ routes.post('/login',async (req, res)=>{
 
 
 //cadastro de alunos
-routes.post('/usuario', async (req, res)=>{
-    
+routes.post('/usuario', async (req, res) => {
     try {
-        const {usuario, senha} = req.body;
+        const { email, senha } = req.body;
 
-        const hash = await Criarhash(senha, 10)
-        
-        await sql`insert into usuarios(usuario, senha, status)
-        values(${usuario},${hash},'aluno')`
+        // Verifica se o email já existe
+        const existingUser = await sql`SELECT * FROM usuarios WHERE email = ${email}`;
+        if (existingUser.length > 0) {
+            return res.status(409).json({ mensagem: "Email já cadastrado" });
+        }
 
-        return res.status(201).json('ok')
+        const hash = await Criarhash(senha, 10);
 
-    } catch(error){
-        console.log(error)
-        return res.status(500).json('algo deu errado')
+        await sql`
+            INSERT INTO usuarios(email, senha)
+            VALUES (${email}, ${hash})
+        `;
 
+        return res.status(201).json({ mensagem: "Usuário criado com sucesso" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ mensagem: "Erro inesperado no servidor" });
     }
 })
-
 
 
 //cadastro de Adiministradores
@@ -77,8 +81,6 @@ routes.post('/Admin', async (req, res)=>{
     }
 
 })
-
-
 
 
 //cadastro perguntas
@@ -114,7 +116,7 @@ routes.post('/Bperguntas',async (req, res)=>{
 routes.delete('/Delete/:pergunta', async (req, res)=>{
 
     try{
-        const id = req.params
+        const {id} = req.params
         await sql`DELETE FROM perguntas WHERE id = ${id};`
         return res.status(200).json('Pergunta deletada')
     }
@@ -124,6 +126,26 @@ routes.delete('/Delete/:pergunta', async (req, res)=>{
     }
 })
 
+//Editar perguntas
+routes.put('/editar', async (req, res)=>{
+    try{
+        const {id, updpergunta, a, b, c, d, dificuldade, resposta} = req.body
+        await sql`update perguntas set pergunta = ${updpergunta}, 
+        a = ${a}, 
+        b = ${b}, 
+        c = ${c}, 
+        d = ${d}, 
+        dificuldade = ${dificuldade}, 
+        resposta = ${resposta}
+        where id = ${id};`
+  
+        return res.status(200).json('Ação efetuada')
+    }
+    catch(error){
+        console.log(error)
+        return res.status(500).json('Erro inesperado')
+    }
+})
 
 
 export default routes
