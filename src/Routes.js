@@ -20,7 +20,7 @@ routes.post('/login',async (req, res)=>{
         const teste = await compararHash(senha, consulta[0].senha)
 
         if(teste){
-            return res.status(200).json('logado')
+            return res.status(201).json('logado')
         }
         else{
             return res.status().json('usuario ou senha incorretos')
@@ -88,7 +88,7 @@ routes.post('/Cperguntas', async (req, res)=>{
     try{
         const {pergunta, a, b, c, d, resposta, dificuldade, correct_answer } = req.body;
     await sql`insert into perguntas (pergunta, a, b, c, d, resposta, dificuldade, correct_answer) values (${pergunta}, ${a}, ${b}, ${c}, ${d}, ${resposta}, ${dificuldade}, ${correct_answer});`
-    return res.status(200).json('ok')
+    return res.status(201).json('ok')
     }
     catch(error){
         console.log(error)
@@ -102,7 +102,7 @@ routes.post('/Bperguntas',async (req, res)=>{
 
     try{
             const consulta = await sql`SELECT * FROM perguntas ORDER BY RANDOM() LIMIT 1`
-            return res.status(200).json(consulta)
+            return res.status(201).json(consulta)
     }
     catch(error){
         console.log(error)
@@ -118,7 +118,7 @@ routes.delete('/Delete/:pergunta', async (req, res)=>{
     try{
         const {id} = req.params
         await sql`DELETE FROM perguntas WHERE id = ${id};`
-        return res.status(200).json('Pergunta deletada')
+        return res.status(204).json('Pergunta deletada')
     }
     catch(error){
         console.log(error)
@@ -139,7 +139,7 @@ routes.put('/editar', async (req, res)=>{
         resposta = ${resposta}
         where id = ${id};`
   
-        return res.status(200).json('Ação efetuada')
+        return res.status(204).json('Ação efetuada')
     }
     catch(error){
         console.log(error)
